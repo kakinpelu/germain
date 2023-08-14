@@ -1,0 +1,48 @@
+---
+# Source: germainux/templates/infra/infra-hazelcast.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: germainapm-hazelcast
+spec:
+  clusterIP: None
+  selector:
+    app: hazelcast
+  ports:
+    - name: germainapm-hazelcast-port
+      port: 5701
+      protocol: TCP
+      targetPort: hazelcast-port
+---
+# Source: germainux/templates/infra/infra-hazelcast.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hazelcast
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hazelcast
+  template:
+    metadata:
+      labels:
+        app: hazelcast
+    spec:
+      containers:
+        - image: "hazelcast/hazelcast:5.2.2-SNAPSHOT"
+          imagePullPolicy: Always
+          name: hazelcast
+          resources:
+            requests:
+              memory: 512Mi
+              cpu: 100m
+            limits:
+              memory: 1024Mi
+              cpu: 1000m
+          ports:
+            - containerPort: 5701
+              name: hazelcast-port
+          env:
+            - name: HZ_CLUSTERNAME
+              value: "germain"

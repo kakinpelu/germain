@@ -1,0 +1,50 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.spec.kibana.serviceName }}
+spec:
+  type: LoadBalancer
+  selector:
+    app: kibana
+  ports:
+    - name: germainapm-kibana-port
+      port: 5601
+      protocol: TCP
+      targetPort: kibana-port
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kibana
+spec:
+  replicas: {{ .Values.spec.kibana.replicas }}
+  selector:
+    matchLabels:
+      app: kibana
+  template:
+    metadata:
+      labels:
+        app: kibana
+    spec:
+      containers:
+        - image: "{{ .Values.spec.kibana.name }}:{{ .Values.spec.kibana.tag }}"
+          imagePullPolicy: {{ .Values.germain.pullPolicy }}
+          name: kibana
+          resources:
+            requests:
+              memory: {{ .Values.spec.kibana.memoryRequest }}
+              cpu: {{ .Values.spec.kibana.cpuRequest }}
+            limits:
+              memory: {{ .Values.spec.kibana.memoryLimit }}
+              cpu: {{ .Values.spec.kibana.cpuLimit }}
+          ports:
+            - containerPort: 5601
+              name: kibana-port
+              protocol: TCP
+          env:
+          - name: ELASTICSEARCH_HOSTS
+            value: "http://{{ .Values.spec.elasticSearch.serviceName }}:9200"
+          - name: XPACK_SECURITY_ENABLED
+            value: "false"

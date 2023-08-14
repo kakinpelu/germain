@@ -1,0 +1,177 @@
+define: &default_cpu_request '100m'
+define: &default_cpu_limit '1000m'
+define: &default_minReadySeconds 10
+define: &default_pullPolicy 'Always'
+
+germain:
+  serverRegistry: 'public.ecr.aws/h0m9e4y5/germainapm-server'
+  servicesRegistry: 'public.ecr.aws/h0m9e4y5/germainapm-services'
+  build: '2023.3'
+  pullPolicy: 'Always'
+  minReadySeconds: 10
+
+germainDb:
+  Hostname: ""
+  Port: "3306"
+  Sid: "orclpdb" #Only applicable for Oracle
+  clusterServiceName: "germainapm-db"
+
+germainDbBootstrap:
+  Username: "germain"
+  Password: "germain-db"
+
+germainConfig:
+  DbType: "MYSQL" #MYSQL/ORACLE
+  Username: "APMCFG"
+  Password: "APMCFG"
+
+germainDatamart:
+  DbType: "MYSQL" #MYSQL/ORACLE/ELASTIC
+  Username: "APMDAT"
+  Password: "APMDAT"
+
+germainIndexer:
+  name: "ELASTIC_SEARCH" #NOOP/SOLR/ELASTIC_SEARCH
+  Url: "http://germainapm-elasticsearch:9200"
+  Username: ""
+  Password: ""
+
+germainMail:
+  From: "noreply@germainuxlocal.com"
+  Host: "localhost"
+  Username: "admin"
+  Password: "admin"
+  Port: "587"
+
+storageClass:
+  name: "ebs-sc"
+  fstype: "ext4"
+  type: "gp3"
+  iops: "3000"
+
+livenessProbe:
+  initialDelaySeconds: 900
+  periodSeconds: 10
+  timeoutSeconds: 5
+  successThreshold: 1
+  failureThreshold: 1000
+
+readinessProbe:
+  initialDelaySeconds: 60
+  periodSeconds: 10
+  timeoutSeconds: 5
+  successThreshold: 1
+  failureThreshold: 3
+
+spec:
+  elasticSearch:
+    name: "elasticsearch"
+    tag: "8.8.1"
+    replicas: 2
+    serviceName: "germainapm-elasticsearch"
+    cpuRequest: *default_cpu_request
+    cpuLimit: *default_cpu_limit
+    memoryRequest: 1024Mi
+    memoryLimit: 2048Mi
+    volumeClaim: 10Gi
+  kibana:
+    name: "kibana"
+    tag: "8.8.1"
+    replicas: 1
+    serviceName: "germainapm-kibana"
+    cpuRequest: *default_cpu_request
+    cpuLimit: *default_cpu_limit
+    memoryRequest: 512Mi
+    memoryLimit: 1024Mi
+  activeMQ:
+    name: "rmohr/activemq"
+    tag: "latest"
+    replicas: 1
+    serviceName: "germainapm-activemq"
+    cpuRequest: *default_cpu_request
+    cpuLimit: *default_cpu_limit
+    memoryRequest: 512Mi
+    memoryLimit: 1024Mi
+  zookeeper:
+    name: "zookeeper"
+    tag: "latest"
+    replicas: 2
+    serviceName: "germainapm-zookeeper"
+    cpuRequest: *default_cpu_request
+    cpuLimit: *default_cpu_limit
+    memoryRequest: 256Mi
+    memoryLimit: 512Mi
+    volumeClaim: 1Gi
+  hazelcast:
+    name: "hazelcast/hazelcast"
+    tag: "5.2.2-SNAPSHOT"
+    replicas: 1
+    serviceName: "germainapm-hazelcast"
+    cpuRequest: *default_cpu_request
+    cpuLimit: *default_cpu_limit
+    memoryRequest: 512Mi
+    memoryLimit: 1024Mi
+  germainServer:
+    replicas: 1
+    serviceName: "germainapm-server"
+    cpuRequest: *default_cpu_request
+    cpuLimit: *default_cpu_limit
+    memoryRequest: 1024Mi
+    memoryLimit: 2048Mi
+  germainStorage:
+    replicas: 1
+    serviceName: "germainapm-storage"
+    cpuRequest: *default_cpu_request
+    cpuLimit: *default_cpu_limit
+    memoryRequest: 1024Mi
+    memoryLimit: 2048Mi
+  germainSession:
+    replicas: 1
+    serviceName: "germainapm-session"
+    cpuRequest: *default_cpu_request
+    cpuLimit: *default_cpu_limit
+    memoryRequest: 1024Mi
+    memoryLimit: 2048Mi
+  germainAnalytics:
+    replicas: 1
+    serviceName: "germainapm-analytics"
+    cpuRequest: *default_cpu_request
+    cpuLimit: *default_cpu_limit
+    memoryRequest: 1024Mi
+    memoryLimit: 2048Mi
+  germainAggregation:
+    replicas: 1
+    serviceName: "germainapm-aggregation"
+    cpuRequest: *default_cpu_request
+    cpuLimit: *default_cpu_limit
+    memoryRequest: 1024Mi
+    memoryLimit: 2048Mi
+  germainAction:
+    replicas: 1
+    serviceName: "germainapm-action"
+    cpuRequest: *default_cpu_request
+    cpuLimit: *default_cpu_limit
+    memoryRequest: 1024Mi
+    memoryLimit: 2048Mi
+  germainRtm:
+    replicas: 1
+    serviceName: "germainapm-rtm"
+    cpuRequest: *default_cpu_request
+    cpuLimit: *default_cpu_limit
+    memoryRequest: 1024Mi
+    memoryLimit: 2048Mi
+
+activeMQXml: "config/activemq.xml"
+activeMQEnv: "config/activemq.env"
+startZookeeper: "config/start-zookeeper"
+zookeeperReady: "config/zookeeper-ready"
+commonProperties: "config/common.properties"
+licenseFolder: "config/license/*"
+rtmVersions: ["2022.5", "2023.1"]
+
+ServiceCheck:
+  zookeeper: while [[ \"$(echo ruok | nc germainapm-zookeeper 2181; echo)\" != \"imok\" ]]; do sleep 5; done;
+  activemq: while [[ \"$(wget --server-response http://germainapm-activemq:8161 2>&1 | awk '/^  HTTP/{print $2}')\" != \"200\" ]]; do sleep 10; done;
+  elastic: while [[ \"$(wget --server-response http://germainapm-elasticsearch:9200 2>&1 | awk '/^  HTTP/{print $2}')\" != \"200\" ]]; do sleep 10; done;
+  db: while [[ \"$(nc -z -v -w3 http://germainapm-db 3306 | grep -o open 2>&1)\" != \"open\" ]]; do sleep 10; done;
+  storage: while [[ \"$(wget --server-response http://germainapm-storage:8080/actuator/prometheus 2>&1 | awk '/^  HTTP/{print $2}')\" != \"200\" ]]; do sleep 10; done;

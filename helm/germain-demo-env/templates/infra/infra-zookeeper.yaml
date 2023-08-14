@@ -1,0 +1,158 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zookeeper-hs
+  labels:
+    app: zookeeper
+spec:
+  ports:
+  - port: 2888
+    name: server
+  - port: 3888
+    name: leader-election
+  clusterIP: None
+  selector:
+    app: zookeeper
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.spec.zookeeper.serviceName }}
+  labels:
+    app: zookeeper
+spec:
+  ports:
+  - port: 2181
+    name: client
+  clusterIP: None
+  selector:
+    app: zookeeper
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: zookeeper-pdb
+spec:
+  selector:
+    matchLabels:
+      app: zookeeper
+  maxUnavailable: 1
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: zookeeper
+spec:
+  replicas: {{ .Values.spec.zookeeper.replicas }}
+  updateStrategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: zookeeper
+  serviceName: zookeeper-hs
+  podManagementPolicy: OrderedReady
+  template:
+    metadata:
+      labels:
+        app: zookeeper
+    spec:
+      volumes:
+        - name: var-logs
+          hostPath:
+            path: /opt/var/zookeeper
+        - name: start-zookeeper
+          configMap:
+            name: start-zookeeper
+            defaultMode: 0777
+        - name: zookeeper-ready
+          configMap:
+            name: zookeeper-ready
+            defaultMode: 0777
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: "app"
+                    operator: In
+                    values:
+                    - zookeeper
+              topologyKey: "kubernetes.io/hostname"
+      containers:
+      - name: kubernetes-zookeeper
+        imagePullPolicy: {{ .Values.germain.pullPolicy }}
+        image: "{{ .Values.spec.zookeeper.name }}:{{ .Values.spec.zookeeper.tag }}"
+        resources:
+          requests:
+            memory: {{ .Values.spec.zookeeper.memoryRequest }}
+            cpu: {{ .Values.spec.zookeeper.cpuRequest }}
+          limits:
+            memory: {{ .Values.spec.zookeeper.memoryLimit }}
+            cpu: {{ .Values.spec.zookeeper.cpuLimit }}
+        ports:
+        - containerPort: 2181
+          name: client
+        - containerPort: 2888
+          name: server
+        - containerPort: 3888
+          name: leader-election
+        command:
+        - sh
+        - -c
+        - "cp /opt/zookeeper/*zookeeper* $PWD/bin/; \
+          $PWD/bin/start-zookeeper \
+          --servers=2 \
+          --data_dir=/var/lib/zookeeper/data \
+          --data_log_dir=/var/lib/zookeeper/data/log \
+          --conf_dir=/conf \
+          --client_port=2181 \
+          --election_port=3888 \
+          --server_port=2888 \
+          --tick_time=2000 \
+          --init_limit=10 \
+          --sync_limit=5 \
+          --heap=512M \
+          --max_client_cnxns=60 \
+          --snap_retain_count=3 \
+          --purge_interval=12 \
+          --max_session_timeout=40000 \
+          --min_session_timeout=4000 \
+          --log_level=INFO"
+        readinessProbe:
+          exec:
+            command:
+            - sh
+            - -c
+            - "/apache-zookeeper-3.8.2-bin/bin/zookeeper-ready 2181"
+          initialDelaySeconds: 60
+          timeoutSeconds: 5
+        livenessProbe:
+          exec:
+            command:
+            - sh
+            - -c
+            - "/apache-zookeeper-3.8.2-bin/bin/zookeeper-ready 2181"
+          initialDelaySeconds: 30
+          timeoutSeconds: 5
+        volumeMounts:
+        - name: datadir
+          mountPath: /var/lib/zookeeper
+        - name: start-zookeeper
+          mountPath: /opt/zookeeper/start-zookeeper
+          subPath: configData
+        - name: zookeeper-ready
+          mountPath: /opt/zookeeper/zookeeper-ready
+          subPath: configData
+      securityContext:
+        runAsUser: 1000
+        fsGroup: 1000
+  volumeClaimTemplates:
+  - metadata:
+      name: datadir
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: ebs-sc
+      resources:
+        requests:
+          storage: {{ .Values.spec.zookeeper.volumeClaim }}

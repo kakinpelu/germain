@@ -1,0 +1,50 @@
+---
+# Source: germainux/templates/germain/germain-services.yaml
+# SERVER - INTERNAL ACCESS
+apiVersion: v1
+kind: Service
+metadata:
+  name: germainapm-server
+spec:
+  selector:
+    service-type: server
+  clusterIP: None
+  ports:
+   - name: service-port
+     port: 8080
+     protocol: TCP
+     targetPort: container-port
+
+# SERVER - EXTERNAL ACCESS
+---
+# Source: germainux/templates/germain/germain-services.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: server-lb
+spec:
+  type: LoadBalancer
+  selector:
+    service-type: server
+  ports:
+   - name: service-port
+     port: 8080
+     protocol: TCP
+     targetPort: container-port
+
+# STORAGE - INTERNAL ACCESS
+---
+# Source: germainux/templates/germain/germain-services.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: germainapm-storage
+spec:
+  clusterIP: None
+  selector:
+    service-type: storage
+  ports:
+   - name: service-port
+     port: 8080
+     protocol: TCP
+     targetPort: container-port

@@ -1,0 +1,48 @@
+---
+# SERVER - INTERNAL ACCESS
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.spec.germainServer.serviceName }}
+spec:
+  selector:
+    service-type: server
+  clusterIP: None
+  ports:
+   - name: service-port
+     port: 8080
+     protocol: TCP
+     targetPort: container-port
+
+# SERVER - EXTERNAL ACCESS
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: server-lb
+spec:
+  type: LoadBalancer
+  selector:
+    service-type: server
+  ports:
+   - name: service-port
+     port: 8080
+     protocol: TCP
+     targetPort: container-port
+
+# STORAGE - INTERNAL ACCESS
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.spec.germainStorage.serviceName }}
+spec:
+  clusterIP: None
+  selector:
+    service-type: storage
+  ports:
+   - name: service-port
+     port: 8080
+     protocol: TCP
+     targetPort: container-port
+

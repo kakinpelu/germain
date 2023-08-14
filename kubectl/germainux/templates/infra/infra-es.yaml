@@ -1,0 +1,108 @@
+---
+# Source: germainux/templates/infra/infra-es.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: germainapm-elasticsearch
+  labels:
+    app: elastic
+spec:
+  selector:
+    app: elastic
+  clusterIP: None
+  ports:
+    - name: elastic-port
+      port: 9200
+    - name: internode-port
+      port: 9300
+---
+# Source: germainux/templates/infra/infra-es.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: elastic
+spec:
+  replicas: 2
+  updateStrategy:
+    type: RollingUpdate
+  volumeClaimTemplates:
+  - metadata:
+      name: esdata
+      labels:
+        app: elastic
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: ebs-sc
+      resources:
+        requests:
+          storage: 10Gi
+  serviceName: germainapm-elasticsearch
+  selector:
+    matchLabels:
+      app: elastic
+  template:
+    metadata:
+      labels:
+        app: elastic
+    spec:
+      containers:
+        - image: "elasticsearch:8.8.1"
+          imagePullPolicy: Always
+          name: elasticsearch
+          resources:
+            requests:
+              memory: 1024Mi
+              cpu: 100m
+            limits:
+              memory: 4096Mi
+              cpu: 1000m
+          volumeMounts:
+          - name: esdata
+            mountPath: /usr/share/elasticsearch/data
+          ports:
+            - containerPort: 9200
+              name: elastic-port
+              protocol: TCP
+            - containerPort: 9300
+              name: internode-port
+              protocol: TCP
+          env:
+            - name: cluster.name
+              value: germain-es-cluster
+            - name: node.name
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: discovery.seed_hosts
+              value: "elastic-0.germainapm-elasticsearch,elastic-1.germainapm-elasticsearch"
+            - name: cluster.initial_master_nodes
+              value: "elastic-0,elastic-1"
+            - name: xpack.security.enabled
+              value: "false"
+            - name: bootstrap.memory_lock
+              value: "true"
+            - name: http.max_content_length
+              value: "150MB"
+          lifecycle:
+            postStart:
+              exec:
+                command: ["/bin/sh", "-c", "cd /usr/share/elasticsearch/plugins && curl -L https://github.com/germainsoftware/germain-es-plugin/releases/download/v8.8.1/germainapm-es-plugin-8.8.1.zip --output germainapm-es-plugin.zip && unzip -d germainapm-es-plugin germainapm-es-plugin.zip && rm -f germainapm-es-plugin.zip"]
+      initContainers:
+      - name: fix-permissions
+        image: busybox
+        command: ["sh", "-c", "chown -R 1000:1000 /usr/share/elasticsearch/data"]
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - name: esdata
+          mountPath: /usr/share/elasticsearch/data
+      - name: increase-vm-max-map
+        image: busybox
+        command: ["sysctl", "-w", "vm.max_map_count=262144"]
+        securityContext:
+          privileged: true
+      - name: increase-fd-ulimit
+        image: busybox
+        command: ["sh", "-c", "ulimit -n 65536"]
+        securityContext:
+          privileged: true

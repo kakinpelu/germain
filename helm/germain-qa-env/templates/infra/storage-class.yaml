@@ -1,0 +1,14 @@
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata: 
+  name: {{ .Values.storageClass.name }}
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "false"
+provisioner: ebs.csi.aws.com
+allowVolumeExpansion: true
+volumeBindingMode: WaitForFirstConsumer
+parameters:
+  csi.storage.k8s.io/fstype: "{{ .Values.storageClass.fstype }}"
+  type: "{{ .Values.storageClass.type }}"
+  iops: "{{ .Values.storageClass.iops }}"

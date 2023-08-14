@@ -1,0 +1,81 @@
+# ACTIVEMQ - INTERNAL ACCESS
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.spec.activeMQ.serviceName }}
+spec:
+  clusterIP: None
+  selector:
+    app: activemq
+  ports:
+    - name: germainapm-activemq-port1
+      port: 8161
+      protocol: TCP
+      targetPort: activemq-port1
+    - name: germainqpm-activemq-port2
+      port: 61616
+      protocol: TCP
+      targetPort: activemq-port2
+
+# ACTIVEMQ - EXTERNAL ACCESS
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: activemq-lb
+spec:
+  type: LoadBalancer
+  selector:
+    service-type: activemq
+  ports:
+   - name: service-port1
+     port: 8161
+     protocol: TCP
+     targetPort: activemq-port1
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: activemq
+spec:
+  replicas: {{ .Values.spec.activeMQ.replicas }}
+  selector:
+    matchLabels:
+      app: activemq
+  template:
+    metadata:
+      labels:
+        app: activemq
+    spec:
+      volumes:
+        - name: activemq-xml
+          configMap:
+            name: activemq-xml
+        - name: activemq-env
+          configMap:
+            name: activemq-env
+      containers:
+        - image: "{{ .Values.spec.activeMQ.name }}:{{ .Values.spec.activeMQ.tag }}"
+          imagePullPolicy: {{ .Values.germain.pullPolicy }}
+          name: activemq
+          resources:
+            requests:
+              memory: {{ .Values.spec.activeMQ.memoryRequest }}
+              cpu: {{ .Values.spec.activeMQ.cpuRequest }}
+            limits:
+              memory: {{ .Values.spec.activeMQ.memoryLimit }}
+              cpu: {{ .Values.spec.activeMQ.cpuLimit }}
+          ports:
+            - containerPort: 8161
+              name: activemq-port1
+            - containerPort: 61616
+              name: activemq-port2
+          volumeMounts:
+            - name: activemq-xml
+              mountPath: /opt/activemq/conf/activemq.xml
+              subPath: configData
+            - name: activemq-env
+              mountPath: /opt/activemq/bin/env
+              subPath: configData

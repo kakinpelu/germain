@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: activemq-xml
+data:
+  configData: |-
+{{ .Files.Get .Values.activeMQXml | indent 4 }}

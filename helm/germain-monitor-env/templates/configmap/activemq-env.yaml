@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: activemq-env
+data:
+  configData: |-
+{{ .Files.Get .Values.activeMQEnv | indent 4 }}

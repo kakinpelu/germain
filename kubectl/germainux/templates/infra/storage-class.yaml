@@ -1,0 +1,15 @@
+---
+# Source: germainux/templates/infra/storage-class.yaml
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata: 
+  name: ebs-sc
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "false"
+provisioner: ebs.csi.aws.com
+allowVolumeExpansion: true
+volumeBindingMode: WaitForFirstConsumer
+parameters:
+  csi.storage.k8s.io/fstype: "ext4"
+  type: "gp3"
+  iops: "3000"

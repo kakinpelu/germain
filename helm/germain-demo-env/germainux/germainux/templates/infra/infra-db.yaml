@@ -1,0 +1,9 @@
+---
+# Source: germainux/templates/infra/infra-db.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: germainapm-db
+spec:
+  type: ExternalName
+  externalName:

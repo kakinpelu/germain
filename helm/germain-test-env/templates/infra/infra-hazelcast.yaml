@@ -1,0 +1,46 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.spec.hazelcast.serviceName }}
+spec:
+  clusterIP: None
+  selector:
+    app: hazelcast
+  ports:
+    - name: germainapm-hazelcast-port
+      port: 5701
+      protocol: TCP
+      targetPort: hazelcast-port
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hazelcast
+spec:
+  replicas: {{ .Values.spec.hazelcast.replicas }}
+  selector:
+    matchLabels:
+      app: hazelcast
+  template:
+    metadata:
+      labels:
+        app: hazelcast
+    spec:
+      containers:
+        - image: "{{ .Values.spec.hazelcast.name }}:{{ .Values.spec.hazelcast.tag }}"
+          imagePullPolicy: {{ .Values.germain.pullPolicy }}
+          name: hazelcast
+          resources:
+            requests:
+              memory: {{ .Values.spec.hazelcast.memoryRequest }}
+              cpu: {{ .Values.spec.hazelcast.cpuRequest }}
+            limits:
+              memory: {{ .Values.spec.hazelcast.memoryLimit }}
+              cpu: {{ .Values.spec.hazelcast.cpuLimit }}
+          ports:
+            - containerPort: 5701
+              name: hazelcast-port
+          env:
+            - name: HZ_CLUSTERNAME
+              value: "germain"

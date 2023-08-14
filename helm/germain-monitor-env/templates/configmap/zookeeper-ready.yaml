@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: zookeeper-ready
+data:
+  configData: |-
+{{ .Files.Get .Values.zookeeperReady | indent 4 }}

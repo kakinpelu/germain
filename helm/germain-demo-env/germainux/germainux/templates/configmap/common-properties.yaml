@@ -1,0 +1,79 @@
+---
+# Source: germainux/templates/configmap/common-properties.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: common-properties
+data:
+  configData: |-
+    
+    germain.bootstrap.url=jdbc:mysql://germainapm-db:3306?rewriteBatchedStatements=true&useSSL=false&allowPublicKeyRetrieval=true
+    germain.bootstrap.username=germain
+    germain.bootstrap.password=germain-db
+    
+    
+    
+    germain.datamart.maximumPoolSize=20
+    germain.datamart.minimumIdle=0
+    germain.datamart.poolName=DatamartPool
+    germain.datamart.driverClassName=com.mysql.cj.jdbc.Driver
+    germain.datamart.url=jdbc:mysql://germainapm-db:3306/APMDAT?rewriteBatchedStatements=true
+    germain.datamart.username=APMDAT
+    germain.datamart.password=APMDAT
+    
+    
+    
+    germain.config.maximumPoolSize=10
+    germain.config.minimumIdle=0
+    germain.config.poolName=ConfigPool
+    germain.config.driverClassName=com.mysql.cj.jdbc.Driver
+    germain.config.url=jdbc:mysql://germainapm-db:3306/APMCFG?rewriteBatchedStatements=true
+    germain.config.username=APMCFG
+    germain.config.password=APMCFG
+    
+    
+    germain.elastic.url=http://germainapm-elasticsearch:9200
+    germain.elastic.properties.indexPrefix=gapm
+    germain.elastic.properties.autoCreateIndices=true
+    
+    germain.indexer.vendor=ELASTIC_SEARCH
+    
+    germain.indexer.url=http://germainapm-elasticsearch:9200
+    germain.indexer.username=
+    germain.indexer.password=
+    
+    germain.indexer.indexPrefix=gapm
+    germain.indexer.dimensionIndexName=gapm-dimension
+    germain.indexer.contentIndexName=gapm-content
+    germain.indexer.documentIndexName=gapm-document
+    
+    germain.messaging.brokerUrl=failover:(tcp://germainapm-activemq:61616?daemon=true&keepAlive=true)
+    germain.messaging.listenerCount=1
+    germain.messaging.maxBufferSize=64
+    
+    germain.messaging.queues.storageDefaultQueue=apm.storage
+    germain.messaging.queues.storageAnalyticsQueue=apm.storage.analytics
+    germain.messaging.queues.analyticsQueue=apm.analytics
+    germain.messaging.queues.actionQueue=apm.action
+    germain.messaging.queues.actionControlQueue=apm.action.control
+    germain.messaging.queues.sessionQueue=apm.session
+    
+    germain.messaging.queues.rtmQueue=apm.rtm
+    
+    germain.messaging.queues.documentAuditQueue=apm.documentAudit
+    germain.messaging.topics.configTopic=apm.config
+    germain.messaging.topics.logTopic=apm.log
+    
+    germain.cache.addresses=germainapm-hazelcast:5701
+    germain.cache.clusterName=germain
+    
+    spring.mail.from=noreply@germainuxlocal.com
+    spring.mail.host=localhost
+    spring.mail.username=admin
+    spring.mail.password=admin
+    spring.mail.port=587
+    spring.mail.properties.mail.smtp.auth=true
+    spring.mail.properties.mail.smtp.starttls.enable=true
+    spring.mail.properties.mail.connectiontimeout=15000
+    spring.mail.properties.mail.timeout=15000 
+    spring.mail.properties.mail.writetimeout=15000

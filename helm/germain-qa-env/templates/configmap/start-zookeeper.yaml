@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: start-zookeeper
+data:
+  configData: |-
+{{ .Files.Get .Values.startZookeeper | indent 4 }}
