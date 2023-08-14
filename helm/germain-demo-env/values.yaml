@@ -2,7 +2,7 @@ define: &default_cpu_request '100m'
 define: &default_cpu_limit '1000m'
 
 germain:
-  build: '2023.3'
+  build: '2023.2'
   serverRegistry: 'public.ecr.aws/h0m9e4y5/germainapm-server'
   servicesRegistry: 'public.ecr.aws/h0m9e4y5/germainapm-services'
   pullPolicy: 'Always'
@@ -103,7 +103,7 @@ spec:
     volumeClaim: 1Gi
   hazelcast:
     name: "hazelcast/hazelcast"
-    tag: "5.2.2-SNAPSHOT"
+    tag: "5.2.3"
     replicas: 1
     serviceName: "germainapm-hazelcast"
     cpuRequest: *default_cpu_request
