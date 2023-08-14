@@ -66,7 +66,7 @@ spec:
   elasticSearch:
     name: "elasticsearch"
     tag: "7.17.7"
-    replicas: 1
+    replicas: 2
     serviceName: "germainapm-elasticsearch"
     cpuRequest: *default_cpu_request
     cpuLimit: *default_cpu_limit
