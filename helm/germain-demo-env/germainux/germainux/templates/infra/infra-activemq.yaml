@@ -5,7 +5,7 @@ kind: Service
 metadata:
   name: germainapm-activemq
 spec:
-  clusterIP: None
+  type: NodePort
   selector:
     app: activemq
   ports:

@@ -8,7 +8,7 @@ metadata:
 spec:
   selector:
     service-type: server
-  clusterIP: None
+  type: NodePort
   ports:
    - name: service-port
      port: 8080
@@ -40,7 +40,7 @@ kind: Service
 metadata:
   name: germainapm-storage
 spec:
-  clusterIP: None
+  type: NodePort
   selector:
     service-type: storage
   ports:
@@ -57,7 +57,7 @@ kind: Service
 metadata:
   name: germainapm-rtm
 spec:
-  clusterIP: None
+  type: NodePort
   selector:
     service-type: rtm
   ports:
@@ -74,7 +74,7 @@ kind: Service
 metadata:
   name: germainapm-session
 spec:
-  clusterIP: None
+  type: NodePort
   selector:
     service-type: session
   ports:
@@ -91,7 +91,7 @@ kind: Service
 metadata:
   name: germainapm-action
 spec:
-  clusterIP: None
+  type: NodePort
   selector:
     service-type: action
   ports:
@@ -108,7 +108,7 @@ kind: Service
 metadata:
   name: germainapm-aggregation
 spec:
-  clusterIP: None
+  type: NodePort
   selector:
     service-type: aggregation
   ports:
@@ -125,7 +125,7 @@ kind: Service
 metadata:
   name: germainapm-analytics
 spec:
-  clusterIP: None
+  type: NodePort
   selector:
     service-type: analytics
   ports:
