@@ -73,9 +73,9 @@ spec:
                 fieldRef:
                   fieldPath: metadata.name
             - name: discovery.seed_hosts
-              value: "elastic-0.germainapm-elasticsearch,elastic-1.germainapm-elasticsearch"
+              value: {{ printf "%s%s" "elastic-" (join ",elastic-" (until (.Values.spec.elasticSearch.replicas | int))) | replace "," (printf ".%s," .Values.spec.elasticSearch.serviceName) }}.{{.Values.spec.elasticSearch.serviceName}}
             - name: cluster.initial_master_nodes
-              value: "elastic-0,elastic-1"
+              value: {{ printf "%s%s" "elastic-" (join ",elastic-" (until (.Values.spec.elasticSearch.replicas | int))) }}
             - name: xpack.security.enabled
               value: "false"
             - name: bootstrap.memory_lock
