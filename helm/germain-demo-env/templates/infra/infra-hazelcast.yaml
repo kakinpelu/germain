@@ -47,4 +47,4 @@ spec:
           lifecycle:
             postStart:
               exec:
-                command: ["/bin/sh", "-c", "cd /opt/hazelcast/lib && curl -L {{ .Values.apmRtmModelUrl }} --output apm-rtm-model.jar"]
+                command: ["/bin/sh", "-c", "curl -L {{ .Values.apmRtmModelUrl }} --output /opt/hazelcast/lib/apm-rtm-model.jar"]
