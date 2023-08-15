@@ -44,3 +44,7 @@ spec:
           env:
             - name: HZ_CLUSTERNAME
               value: "germain"
+          lifecycle:
+            postStart:
+              exec:
+                command: ["/bin/sh", "-c", "cd /opt/hazelcast/lib && curl -L {{ .Values.apmRtmModelUrl }} --output apm-rtm-model.jar"]
