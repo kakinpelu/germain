@@ -103,7 +103,7 @@ spec:
     volumeClaim: 1Gi
   hazelcast:
     name: "hazelcast/hazelcast"
-    tag: "latest"
+    tag: "5.2.3"
     replicas: 1
     serviceName: "germainapm-hazelcast"
     cpuRequest: *default_cpu_request
