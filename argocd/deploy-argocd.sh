@@ -28,9 +28,19 @@ echo "ArgoCD Password:" ${defaultPass}
 # APPLY CUSTOM CONFIGURATIONS
 #############################################################################################################################
 
-rm -f ./argocd-custom.yaml
-cp ./argocd-custom-template.yaml ./argocd-custom.yaml
-sed -i "s|{{argoCdGitSyncInterval}}|${argoCdGitSyncInterval}|g" ./argocd-custom.yaml
+cat > ./argocd-custom.yaml<< EOF
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-cm
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: argocd-cm
+    app.kubernetes.io/part-of: argocd
+data:
+  timeout.reconciliation: ${argoCdGitSyncInterval}
+EOF
+
 kubectl apply -f ./argocd-custom.yaml
 kubectl rollout restart deployment argocd-repo-server -n argocd
 
