@@ -29,7 +29,11 @@ spec:
         app: kibana
     spec:
       containers:
-        - image: "{{ .Values.spec.kibana.name }}:{{ .Values.spec.kibana.tag }}"
+        {{if ge ((regexFind "[0-9]{1,}\\.[0-9]{1,}" .Values.germain.build) | float64) 2023.3 }}
+        - image: "{{ .Values.spec.kibana.name }}:{{ .Values.spec.elasticSearch.latestTag }}"
+        {{ else }}
+        - image: "{{ .Values.spec.kibana.name }}:{{ .Values.spec.elasticSearch.legacyTag }}"
+        {{ end }}
           imagePullPolicy: {{ .Values.germain.pullPolicy }}
           name: kibana
           resources:

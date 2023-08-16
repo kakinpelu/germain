@@ -45,7 +45,11 @@ spec:
         app: elastic
     spec:
       containers:
-        - image: "{{ .Values.spec.elasticSearch.name }}:{{ .Values.spec.elasticSearch.tag }}"
+        {{if ge ((regexFind "[0-9]{1,}\\.[0-9]{1,}" .Values.germain.build) | float64) 2023.3 }}
+        - image: "{{ .Values.spec.elasticSearch.name }}:{{ .Values.spec.elasticSearch.latestTag }}"
+        {{ else }}
+        - image: "{{ .Values.spec.elasticSearch.name }}:{{ .Values.spec.elasticSearch.legacyTag }}"
+        {{ end }}
           imagePullPolicy: {{ .Values.germain.pullPolicy }}
           name: elasticsearch
           resources:
@@ -85,7 +89,11 @@ spec:
           lifecycle:
             postStart:
               exec:
-                command: ["/bin/sh", "-c", "cd /usr/share/elasticsearch/plugins && curl -L https://github.com/germainsoftware/germain-es-plugin/releases/download/v{{.Values.spec.elasticSearch.tag}}/germainapm-es-plugin-{{.Values.spec.elasticSearch.tag}}.zip --output germainapm-es-plugin.zip && unzip -d germainapm-es-plugin germainapm-es-plugin.zip && rm -f germainapm-es-plugin.zip"]
+              {{ if ge ((regexFind "[0-9]{1,}\\.[0-9]{1,}" .Values.germain.build) | float64) 2023.3 }}
+                command: ["/bin/sh", "-c", "cd /usr/share/elasticsearch/plugins && curl -L https://github.com/germainsoftware/germain-es-plugin/releases/download/v{{.Values.spec.elasticSearch.latestTag}}/germainapm-es-plugin-{{.Values.spec.elasticSearch.latestTag}}.zip --output germainapm-es-plugin.zip && unzip -d germainapm-es-plugin germainapm-es-plugin.zip && rm -f germainapm-es-plugin.zip"]
+              {{ else }}
+                command: ["/bin/sh", "-c", "cd /usr/share/elasticsearch/plugins && curl -L https://github.com/germainsoftware/germain-es-plugin/releases/download/v{{.Values.spec.elasticSearch.legacyTag}}/germainapm-es-plugin-{{.Values.spec.elasticSearch.legacyTag}}.zip --output germainapm-es-plugin.zip && unzip -d germainapm-es-plugin germainapm-es-plugin.zip && rm -f germainapm-es-plugin.zip"]
+              {{ end }}
       initContainers:
       - name: fix-permissions
         image: busybox

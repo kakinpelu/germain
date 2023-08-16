@@ -42,7 +42,7 @@ germainMail:
   Password: "admin"
   Port: "587"
 
-storageClass:
+ebsStorageClass:
   name: "ebs-sc"
   fstype: "ext4"
   type: "gp3"
@@ -65,7 +65,8 @@ readinessProbe:
 spec:
   elasticSearch:
     name: "elasticsearch"
-    tag: "8.8.1"
+    legacyTag: "7.17.7"
+    latestTag: "8.8.1"
     replicas: 2
     serviceName: "germainapm-elasticsearch"
     cpuRequest: *default_cpu_request
@@ -75,7 +76,6 @@ spec:
     volumeClaim: 10Gi
   kibana:
     name: "kibana"
-    tag: "8.8.1"
     replicas: 1
     serviceName: "germainapm-kibana"
     cpuRequest: *default_cpu_request
