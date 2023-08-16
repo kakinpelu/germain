@@ -40,7 +40,7 @@ spec:
         app: db
     spec:
       containers:
-        - image: image: mysql:8.0
+        - image: mysql:8.0
           imagePullPolicy: {{ .Values.germain.pullPolicy }}
           name: germainapm-db
           resources:
