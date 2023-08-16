@@ -109,6 +109,14 @@ spec:
     cpuLimit: *default_cpu_limit
     memoryRequest: 512Mi
     memoryLimit: 1024Mi
+  mysql:
+    name: "mysql"
+    tag: "latest"
+    replicas: 1
+    cpuRequest: *default_cpu_request
+    cpuLimit: *default_cpu_limit
+    memoryRequest: 512Mi
+    memoryLimit: 1024Mi
   germainServer:
     replicas: 2
     serviceName: "germainapm-server"
