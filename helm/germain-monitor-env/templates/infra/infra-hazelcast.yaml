@@ -27,6 +27,10 @@ spec:
       labels:
         app: hazelcast
     spec:
+      volumes:
+        - name: lib-path
+          hostPath:
+            path: /opt/hazelcast/lib
       containers:
         - image: "{{ .Values.spec.hazelcast.name }}:{{ .Values.spec.hazelcast.tag }}"
           imagePullPolicy: {{ .Values.germain.pullPolicy }}
@@ -44,3 +48,16 @@ spec:
           env:
             - name: HZ_CLUSTERNAME
               value: "germain"
+          volumeMounts:
+            - name: lib-path
+              mountPath: /opt/hazelcast/lib/apm-rtm-model.jar
+              subPath: apm-rtm-model.jar
+      initContainers:
+      - name: get-apm-rtm-model
+        image: busybox
+        command: ["/bin/sh", "-c", "wget -q {{ .Values.apmRtmModelUrl }} -P /opt/hazelcast/lib"]
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - name: lib-path
+          mountPath: /opt/hazelcast/lib

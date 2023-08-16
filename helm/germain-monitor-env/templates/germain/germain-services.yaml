@@ -46,3 +46,82 @@ spec:
      protocol: TCP
      targetPort: container-port
 
+# RTM - INTERNAL ACCESS
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.spec.germainRtm.serviceName }}
+spec:
+  clusterIP: None
+  selector:
+    service-type: rtm
+  ports:
+   - name: service-port
+     port: 8080
+     protocol: TCP
+     targetPort: container-port
+
+# SESSION - INTERNAL ACCESS
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.spec.germainSession.serviceName }}
+spec:
+  clusterIP: None
+  selector:
+    service-type: session
+  ports:
+   - name: service-port
+     port: 8080
+     protocol: TCP
+     targetPort: container-port
+
+# ACTION - INTERNAL ACCESS
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.spec.germainAction.serviceName }}
+spec:
+  clusterIP: None
+  selector:
+    service-type: action
+  ports:
+   - name: service-port
+     port: 8080
+     protocol: TCP
+     targetPort: container-port
+
+# AGGREGATION - INTERNAL ACCESS
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.spec.germainAggregation.serviceName }}
+spec:
+  clusterIP: None
+  selector:
+    service-type: aggregation
+  ports:
+   - name: service-port
+     port: 8080
+     protocol: TCP
+     targetPort: container-port
+
+# ANALYTICS - INTERNAL ACCESS
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.spec.germainAnalytics.serviceName }}
+spec:
+  clusterIP: None
+  selector:
+    service-type: analytics
+  ports:
+   - name: service-port
+     port: 8080
+     protocol: TCP
+     targetPort: container-port

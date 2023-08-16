@@ -4,5 +4,43 @@ kind: Service
 metadata:
   name: {{ .Values.germainDb.clusterServiceName }}
 spec:
-  type: ExternalName
-  externalName: {{ .Values.germainDb.Hostname }}
+  #type: ExternalName
+  #externalName: {{ .Values.germainDb.Hostname }}
+  ports:
+  - port: 3306
+  selector:
+    app: db
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: db
+  template:
+    metadata:
+      labels:
+        app: db
+    spec:
+      containers:
+        - image: image: mysql:8.0
+          imagePullPolicy: {{ .Values.germain.pullPolicy }}
+          name: germainapm-db
+          resources:
+            requests:
+              memory: 512Mi
+              cpu: 100m
+            limits:
+              memory: 1024Mi
+              cpu: 1000m
+          ports:
+            - containerPort: 5601
+              name: db-port
+              protocol: TCP
+          env:
+          - name: MYSQL_ROOT_PASSWORD
+            value: "P@ssw0rd"

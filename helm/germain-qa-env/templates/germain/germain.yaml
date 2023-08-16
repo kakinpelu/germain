@@ -22,7 +22,7 @@ spec:
           hostPath:
             path: /opt/var/logs
       containers:
-        - image: "{{ .Values.germain.serverRegistry }}:{{ .Values.germain.build }}"
+        - image: "{{ .Values.germain.registry }}/germainapm-server:{{ .Values.germain.build }}"
           imagePullPolicy: {{ .Values.germain.pullPolicy }}
           name: germain-server
           resources:
@@ -42,6 +42,8 @@ spec:
               value: "{{ .Values.spec.zookeeper.serviceName }}:2181"
             - name: ELASTIC_URL
               value: "true"
+            - name: GERMAIN_XMX
+              value: '{{ .Values.spec.germainServer.memoryLimit | upper | replace "I" "" }}'
           volumeMounts:
             - name: var-logs
               mountPath: /opt/tomcat8/logs
@@ -105,7 +107,7 @@ spec:
           configMap:
             name: license-folder
       containers:
-        - image: "{{ .Values.germain.servicesRegistry }}:{{ .Values.germain.build }}"
+        - image: "{{ .Values.germain.registry }}/germainapm-services:{{ .Values.germain.build }}"
           imagePullPolicy: {{ .Values.germain.pullPolicy }}
           name: germainapm-storage
           resources:
@@ -128,7 +130,9 @@ spec:
             - name: SERVICE_NAME
               value: "storage"
             - name: BOOTSTRAP_ARGS
-              value: "--upgrade-schema --upgrade-config -f -r"
+              value: {{ .Values.germain.bootstrapArgs }}
+            - name: GERMAIN_XMX
+              value: '{{ .Values.spec.germainStorage.memoryLimit | upper | replace "I" "" }}'
           volumeMounts:
             - name: var-logs
               mountPath: /opt/services/var
@@ -176,7 +180,7 @@ kind: Deployment
 metadata:
   name: {{ .Values.spec.germainRtm.serviceName }}
 spec:
-{{if has (substr 0 6 .Values.germain.build) .Values.rtmVersions }}
+{{- if le ((regexFind "[0-9]{1,}\\.[0-9]{1,}" .Values.germain.build) | float64) 2023.1 -}}
   replicas: {{ .Values.spec.germainRtm.replicas }}
 {{ else }}
   replicas: 0
@@ -198,7 +202,7 @@ spec:
           hostPath:
             path: /opt/var
       containers:
-        - image: "{{ .Values.germain.servicesRegistry }}:{{ .Values.germain.build }}"
+        - image: "{{ .Values.germain.registry }}/germainapm-services:{{ .Values.germain.build }}"
           imagePullPolicy: {{ .Values.germain.pullPolicy }}
           name: germainapm-rtm
           resources:
@@ -222,6 +226,8 @@ spec:
               value: "rtm"
             - name: SERVICE_PORT
               value: "8096"
+            - name: GERMAIN_XMX
+              value: '{{ .Values.spec.germainRtm.memoryLimit | upper | replace "I" "" }}'
           volumeMounts:
             - name: var-logs
               mountPath: /opt/services/var
@@ -279,7 +285,7 @@ spec:
           hostPath:
             path: /opt/var
       containers:
-        - image: "{{ .Values.germain.servicesRegistry }}:{{ .Values.germain.build }}"
+        - image: "{{ .Values.germain.registry }}/germainapm-services:{{ .Values.germain.build }}"
           imagePullPolicy: {{ .Values.germain.pullPolicy }}
           name: germainapm-session
           resources:
@@ -301,6 +307,8 @@ spec:
               value: "true"
             - name: SERVICE_NAME
               value: "session"
+            - name: GERMAIN_XMX
+              value: '{{ .Values.spec.germainSession.memoryLimit | upper | replace "I" "" }}'
           volumeMounts:
             - name: var-logs
               mountPath: /opt/services/var
@@ -358,7 +366,7 @@ spec:
           hostPath:
             path: /opt/var
       containers:
-        - image: "{{ .Values.germain.servicesRegistry }}:{{ .Values.germain.build }}"
+        - image: "{{ .Values.germain.registry }}/germainapm-services:{{ .Values.germain.build }}"
           imagePullPolicy: {{ .Values.germain.pullPolicy }}
           name: germainapm-analytics
           resources:
@@ -382,6 +390,8 @@ spec:
               value: "analytics"
             - name: SERVICE_PORT
               value: "8094"
+            - name: GERMAIN_XMX
+              value: '{{ .Values.spec.germainAnalytics.memoryLimit | upper | replace "I" "" }}'
           volumeMounts:
             - name: var-logs
               mountPath: /opt/services/var
@@ -439,7 +449,7 @@ spec:
           hostPath:
             path: /opt/var
       containers:
-        - image: "{{ .Values.germain.servicesRegistry }}:{{ .Values.germain.build }}"
+        - image: "{{ .Values.germain.registry }}/germainapm-services:{{ .Values.germain.build }}"
           imagePullPolicy: {{ .Values.germain.pullPolicy }}
           name: germainapm-aggregation
           resources:
@@ -463,6 +473,8 @@ spec:
               value: "aggregation"
             - name: SERVICE_PORT
               value: "8092"
+            - name: GERMAIN_XMX
+              value: '{{ .Values.spec.germainAggregation.memoryLimit | upper | replace "I" "" }}'
           volumeMounts:
             - name: var-logs
               mountPath: /opt/services/var
@@ -520,7 +532,7 @@ spec:
           hostPath:
             path: /opt/var
       containers:
-        - image: "{{ .Values.germain.servicesRegistry }}:{{ .Values.germain.build }}"
+        - image: "{{ .Values.germain.registry }}/germainapm-services:{{ .Values.germain.build }}"
           imagePullPolicy: {{ .Values.germain.pullPolicy }}
           name: germainapm-action
           resources:
@@ -542,6 +554,8 @@ spec:
               value: "true"
             - name: SERVICE_NAME
               value: "action"
+            - name: GERMAIN_XMX
+              value: '{{ .Values.spec.germainAction.memoryLimit | upper | replace "I" "" }}'
           volumeMounts:
             - name: var-logs
               mountPath: /opt/services/var
