@@ -15,8 +15,8 @@ germainDb:
   clusterServiceName: "germainapm-db"
 
 germainDbBootstrap:
-  Username: "germain"
-  Password: "germain-db"
+  Username: "root"
+  Password: "P@ssw0rd"
 
 germainConfig:
   DbType: "MYSQL" #MYSQL/ORACLE

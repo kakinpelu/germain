@@ -56,4 +56,4 @@ spec:
               protocol: TCP
           env:
           - name: MYSQL_ROOT_PASSWORD
-            value: "P@ssw0rd"
+            value: {{ .Values.germainDbBootstrap.Password }}
