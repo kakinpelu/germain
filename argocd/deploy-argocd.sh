@@ -1,5 +1,5 @@
 installArgoCdClient="true"
-argoCdGitSyncInterval="30s"
+argoCdGitSyncInterval="10s"
 
 #############################################################################################################################
 # DEPLOY ARGOCD TO CLUSTER
