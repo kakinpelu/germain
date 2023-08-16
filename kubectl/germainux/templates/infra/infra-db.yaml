@@ -6,4 +6,4 @@ metadata:
   name: germainapm-db
 spec:
   type: ExternalName
-  externalName: germain-db.crs7ftpnebbj.us-west-2.rds.amazonaws.com
+  externalName:

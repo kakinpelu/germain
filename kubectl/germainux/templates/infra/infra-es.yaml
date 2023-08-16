@@ -46,7 +46,9 @@ spec:
         app: elastic
     spec:
       containers:
+        
         - image: "elasticsearch:8.8.1"
+        
           imagePullPolicy: Always
           name: elasticsearch
           resources:
@@ -54,7 +56,7 @@ spec:
               memory: 1024Mi
               cpu: 100m
             limits:
-              memory: 4096Mi
+              memory: 2048Mi
               cpu: 1000m
           volumeMounts:
           - name: esdata
@@ -74,9 +76,9 @@ spec:
                 fieldRef:
                   fieldPath: metadata.name
             - name: discovery.seed_hosts
-              value: "elastic-0.germainapm-elasticsearch,elastic-1.germainapm-elasticsearch"
+              value: elastic-0.germainapm-elasticsearch,elastic-1.germainapm-elasticsearch
             - name: cluster.initial_master_nodes
-              value: "elastic-0,elastic-1"
+              value: elastic-0,elastic-1
             - name: xpack.security.enabled
               value: "false"
             - name: bootstrap.memory_lock
@@ -86,7 +88,9 @@ spec:
           lifecycle:
             postStart:
               exec:
+              
                 command: ["/bin/sh", "-c", "cd /usr/share/elasticsearch/plugins && curl -L https://github.com/germainsoftware/germain-es-plugin/releases/download/v8.8.1/germainapm-es-plugin-8.8.1.zip --output germainapm-es-plugin.zip && unzip -d germainapm-es-plugin germainapm-es-plugin.zip && rm -f germainapm-es-plugin.zip"]
+              
       initContainers:
       - name: fix-permissions
         image: busybox

@@ -6,6 +6,7 @@ metadata:
   name: common-properties
 data:
   configData: |-
+    
     germain.bootstrap.url=jdbc:mysql://germainapm-db:3306?rewriteBatchedStatements=true&useSSL=false&allowPublicKeyRetrieval=true
     germain.bootstrap.username=germain
     germain.bootstrap.password=germain-db
@@ -19,6 +20,9 @@ data:
     germain.datamart.url=jdbc:mysql://germainapm-db:3306/APMDAT?rewriteBatchedStatements=true
     germain.datamart.username=APMDAT
     germain.datamart.password=APMDAT
+    
+    
+    
     germain.config.maximumPoolSize=10
     germain.config.minimumIdle=0
     germain.config.poolName=ConfigPool
@@ -36,7 +40,9 @@ data:
     
     germain.indexer.url=http://germainapm-elasticsearch:9200
     germain.indexer.username=
-    germain.indexer.password=germain.indexer.indexPrefix=gapm
+    germain.indexer.password=
+    
+    germain.indexer.indexPrefix=gapm
     germain.indexer.dimensionIndexName=gapm-dimension
     germain.indexer.contentIndexName=gapm-content
     germain.indexer.documentIndexName=gapm-document
@@ -51,6 +57,7 @@ data:
     germain.messaging.queues.actionQueue=apm.action
     germain.messaging.queues.actionControlQueue=apm.action.control
     germain.messaging.queues.sessionQueue=apm.session
+    
     germain.messaging.queues.documentAuditQueue=apm.documentAudit
     germain.messaging.topics.configTopic=apm.config
     germain.messaging.topics.logTopic=apm.log

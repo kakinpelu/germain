@@ -31,7 +31,7 @@ spec:
               memory: 1024Mi
               cpu: 100m
             limits:
-              memory: 4096Mi
+              memory: 2048Mi
               cpu: 1000m
           ports:
             - containerPort: 8080
@@ -43,6 +43,8 @@ spec:
               value: "germainapm-zookeeper:2181"
             - name: ELASTIC_URL
               value: "true"
+            - name: GERMAIN_XMX
+              value: '2048M'
           volumeMounts:
             - name: var-logs
               mountPath: /opt/tomcat8/logs
@@ -54,7 +56,7 @@ spec:
             periodSeconds: 10
             timeoutSeconds: 5
             successThreshold: 1
-            failureThreshold: 20
+            failureThreshold: 999
           readinessProbe:
             httpGet:
               path: /actuator/prometheus
@@ -115,7 +117,7 @@ spec:
               memory: 1024Mi
               cpu: 100m
             limits:
-              memory: 4096Mi
+              memory: 2048Mi
               cpu: 1000m
           ports:
             - containerPort: 8080
@@ -129,6 +131,10 @@ spec:
               value: "true"
             - name: SERVICE_NAME
               value: "storage"
+            - name: BOOTSTRAP_ARGS
+              value: --upgrade-schema --upgrade-config -f -r
+            - name: GERMAIN_XMX
+              value: '2048M'
           volumeMounts:
             - name: var-logs
               mountPath: /opt/services/var
@@ -145,7 +151,7 @@ spec:
             periodSeconds: 10
             timeoutSeconds: 5
             successThreshold: 1
-            failureThreshold: 20
+            failureThreshold: 999
           readinessProbe:
             httpGet:
               path: /actuator/prometheus
@@ -169,7 +175,90 @@ spec:
         securityContext:
           privileged: true
 
+# RTM
+---
+# Source: germainux/templates/germain/germain.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: germainapm-rtm
+spec:
+  replicas: 0
 
+  minReadySeconds: 10
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      service-type: rtm
+  template:
+    metadata:
+      labels:
+        service-type: rtm
+    spec:
+      hostname: germainapm-rtm
+      volumes:
+        - name: var-logs
+          hostPath:
+            path: /opt/var
+      containers:
+        - image: "public.ecr.aws/h0m9e4y5/germainapm-services:2023.3"
+          imagePullPolicy: Always
+          name: germainapm-rtm
+          resources:
+            requests:
+              memory: 1024Mi
+              cpu: 100m
+            limits:
+              memory: 2048Mi
+              cpu: 1000m
+          ports:
+          - containerPort: 8096
+            name: container-port
+          env:
+            - name: GERMAIN_ENV
+              value: "germain"
+            - name: ZK_URL
+              value: "germainapm-zookeeper:2181"
+            - name: ELASTIC_URL
+              value: "true"
+            - name: SERVICE_NAME
+              value: "rtm"
+            - name: SERVICE_PORT
+              value: "8096"
+            - name: GERMAIN_XMX
+              value: '2048M'
+          volumeMounts:
+            - name: var-logs
+              mountPath: /opt/services/var
+          livenessProbe:
+            httpGet:
+              path: /actuator/prometheus
+              port: container-port
+            initialDelaySeconds: 900
+            periodSeconds: 10
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 999
+          readinessProbe:
+            httpGet:
+              path: /actuator/prometheus
+              port: container-port
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
+      initContainers:
+      - name: prerequisite-check
+        image: busybox
+        args: [
+          "/bin/sh",
+          "-c",
+          "while [[ \"$(wget --server-response http://germainapm-storage:8080/actuator/prometheus 2>&1 | awk '/^  HTTP/{print $2}')\" != \"200\" ]]; do sleep 10; done;"
+        ]
+        securityContext:
+          privileged: true
 
 # SESSION
 ---
@@ -202,7 +291,7 @@ spec:
           name: germainapm-session
           resources:
             requests:
-              memory: 512Mi
+              memory: 1024Mi
               cpu: 100m
             limits:
               memory: 2048Mi
@@ -219,6 +308,8 @@ spec:
               value: "true"
             - name: SERVICE_NAME
               value: "session"
+            - name: GERMAIN_XMX
+              value: '2048M'
           volumeMounts:
             - name: var-logs
               mountPath: /opt/services/var
@@ -230,7 +321,7 @@ spec:
             periodSeconds: 10
             timeoutSeconds: 5
             successThreshold: 1
-            failureThreshold: 20
+            failureThreshold: 999
           readinessProbe:
             httpGet:
               path: /actuator/prometheus
@@ -241,7 +332,7 @@ spec:
             successThreshold: 1
             failureThreshold: 3
       initContainers:
-      - name: wait-for-storage
+      - name: prerequisite-check
         image: busybox
         args: [
           "/bin/sh",
@@ -282,7 +373,7 @@ spec:
           name: germainapm-analytics
           resources:
             requests:
-              memory: 512Mi
+              memory: 1024Mi
               cpu: 100m
             limits:
               memory: 2048Mi
@@ -301,6 +392,8 @@ spec:
               value: "analytics"
             - name: SERVICE_PORT
               value: "8094"
+            - name: GERMAIN_XMX
+              value: '2048M'
           volumeMounts:
             - name: var-logs
               mountPath: /opt/services/var
@@ -312,7 +405,7 @@ spec:
             periodSeconds: 10
             timeoutSeconds: 5
             successThreshold: 1
-            failureThreshold: 20
+            failureThreshold: 999
           readinessProbe:
             httpGet:
               path: /actuator/prometheus
@@ -323,7 +416,7 @@ spec:
             successThreshold: 1
             failureThreshold: 3
       initContainers:
-      - name: wait-for-storage
+      - name: prerequisite-check
         image: busybox
         args: [
           "/bin/sh",
@@ -364,7 +457,7 @@ spec:
           name: germainapm-aggregation
           resources:
             requests:
-              memory: 512Mi
+              memory: 1024Mi
               cpu: 100m
             limits:
               memory: 2048Mi
@@ -383,6 +476,8 @@ spec:
               value: "aggregation"
             - name: SERVICE_PORT
               value: "8092"
+            - name: GERMAIN_XMX
+              value: '2048M'
           volumeMounts:
             - name: var-logs
               mountPath: /opt/services/var
@@ -394,7 +489,7 @@ spec:
             periodSeconds: 10
             timeoutSeconds: 5
             successThreshold: 1
-            failureThreshold: 20
+            failureThreshold: 999
           readinessProbe:
             httpGet:
               path: /actuator/prometheus
@@ -405,7 +500,7 @@ spec:
             successThreshold: 1
             failureThreshold: 3
       initContainers:
-      - name: wait-for-storage
+      - name: prerequisite-check
         image: busybox
         args: [
           "/bin/sh",
@@ -446,7 +541,7 @@ spec:
           name: germainapm-action
           resources:
             requests:
-              memory: 512Mi
+              memory: 1024Mi
               cpu: 100m
             limits:
               memory: 2048Mi
@@ -463,6 +558,8 @@ spec:
               value: "true"
             - name: SERVICE_NAME
               value: "action"
+            - name: GERMAIN_XMX
+              value: '2048M'
           volumeMounts:
             - name: var-logs
               mountPath: /opt/services/var
@@ -474,7 +571,7 @@ spec:
             periodSeconds: 10
             timeoutSeconds: 5
             successThreshold: 1
-            failureThreshold: 20
+            failureThreshold: 999
           readinessProbe:
             httpGet:
               path: /actuator/prometheus
@@ -485,7 +582,7 @@ spec:
             successThreshold: 1
             failureThreshold: 3
       initContainers:
-      - name: wait-for-storage
+      - name: prerequisite-check
         image: busybox
         args: [
           "/bin/sh",

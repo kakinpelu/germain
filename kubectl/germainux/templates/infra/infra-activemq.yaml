@@ -30,7 +30,7 @@ spec:
   selector:
     service-type: activemq
   ports:
-   - name: service-port
+   - name: service-port1
      port: 8161
      protocol: TCP
      targetPort: activemq-port1
@@ -63,7 +63,7 @@ spec:
           name: activemq
           resources:
             requests:
-              memory: 256Mi
+              memory: 512Mi
               cpu: 100m
             limits:
               memory: 1024Mi

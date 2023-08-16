@@ -48,3 +48,88 @@ spec:
      port: 8080
      protocol: TCP
      targetPort: container-port
+
+# RTM - INTERNAL ACCESS
+---
+# Source: germainux/templates/germain/germain-services.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: germainapm-rtm
+spec:
+  clusterIP: None
+  selector:
+    service-type: rtm
+  ports:
+   - name: service-port
+     port: 8080
+     protocol: TCP
+     targetPort: container-port
+
+# SESSION - INTERNAL ACCESS
+---
+# Source: germainux/templates/germain/germain-services.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: germainapm-session
+spec:
+  clusterIP: None
+  selector:
+    service-type: session
+  ports:
+   - name: service-port
+     port: 8080
+     protocol: TCP
+     targetPort: container-port
+
+# ACTION - INTERNAL ACCESS
+---
+# Source: germainux/templates/germain/germain-services.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: germainapm-action
+spec:
+  clusterIP: None
+  selector:
+    service-type: action
+  ports:
+   - name: service-port
+     port: 8080
+     protocol: TCP
+     targetPort: container-port
+
+# AGGREGATION - INTERNAL ACCESS
+---
+# Source: germainux/templates/germain/germain-services.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: germainapm-aggregation
+spec:
+  clusterIP: None
+  selector:
+    service-type: aggregation
+  ports:
+   - name: service-port
+     port: 8080
+     protocol: TCP
+     targetPort: container-port
+
+# ANALYTICS - INTERNAL ACCESS
+---
+# Source: germainux/templates/germain/germain-services.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: germainapm-analytics
+spec:
+  clusterIP: None
+  selector:
+    service-type: analytics
+  ports:
+   - name: service-port
+     port: 8080
+     protocol: TCP
+     targetPort: container-port

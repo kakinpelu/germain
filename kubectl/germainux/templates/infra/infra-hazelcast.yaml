@@ -29,8 +29,12 @@ spec:
       labels:
         app: hazelcast
     spec:
+      volumes:
+        - name: lib-path
+          hostPath:
+            path: /opt/hazelcast/lib
       containers:
-        - image: "hazelcast/hazelcast:5.2.2-SNAPSHOT"
+        - image: "hazelcast/hazelcast:latest"
           imagePullPolicy: Always
           name: hazelcast
           resources:
@@ -38,7 +42,7 @@ spec:
               memory: 512Mi
               cpu: 100m
             limits:
-              memory: 2048Mi
+              memory: 1024Mi
               cpu: 1000m
           ports:
             - containerPort: 5701
@@ -46,3 +50,16 @@ spec:
           env:
             - name: HZ_CLUSTERNAME
               value: "germain"
+          volumeMounts:
+            - name: lib-path
+              mountPath: /opt/hazelcast/lib/apm-rtm-model.jar
+              subPath: apm-rtm-model.jar
+      initContainers:
+      - name: get-apm-rtm-model
+        image: busybox
+        command: ["/bin/sh", "-c", "wget -q https://github.com/kakinpelu/germain/raw/main/helm/germain-demo-env/config/apm-rtm-model.jar -P /opt/hazelcast/lib"]
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - name: lib-path
+          mountPath: /opt/hazelcast/lib
