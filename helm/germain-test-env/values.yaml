@@ -117,6 +117,7 @@ spec:
     cpuLimit: *default_cpu_limit
     memoryRequest: 512Mi
     memoryLimit: 1024Mi
+    volumeClaim: 1Gi
   germainServer:
     replicas: 2
     serviceName: "germainapm-server"

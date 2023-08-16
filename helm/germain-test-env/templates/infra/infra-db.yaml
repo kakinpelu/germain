@@ -21,11 +21,23 @@ spec:
 
 ---
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: db
 spec:
   replicas: {{ .Values.spec.mysql.replicas }}
+  updateStrategy:
+    type: RollingUpdate
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: {{ .Values.ebsStorageClass.name }}
+      resources:
+        requests:
+          storage: {{ .Values.spec.mysql.volumeClaim }}
+  serviceName: {{ .Values.germainDb.clusterServiceName }}
   selector:
     matchLabels:
       app: db
@@ -52,6 +64,9 @@ spec:
           env:
           - name: MYSQL_ROOT_PASSWORD
             value: {{ .Values.germainDbBootstrap.Password }}
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/mysql
 {{ else }}
 
 ---

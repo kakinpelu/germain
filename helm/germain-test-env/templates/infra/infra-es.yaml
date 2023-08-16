@@ -31,7 +31,7 @@ spec:
         app: elastic
     spec:
       accessModes: [ "ReadWriteOnce" ]
-      storageClassName: ebs-sc
+      storageClassName: {{ .Values.ebsStorageClass.name }}
       resources:
         requests:
           storage: {{ .Values.spec.elasticSearch.volumeClaim }}
