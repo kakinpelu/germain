@@ -3,8 +3,7 @@ define: &default_cpu_limit '1000m'
 
 germain:
   build: '2023.3'
-  serverRegistry: 'public.ecr.aws/h0m9e4y5/germainapm-server'
-  servicesRegistry: 'public.ecr.aws/h0m9e4y5/germainapm-services'
+  registry: 'public.ecr.aws/h0m9e4y5'
   pullPolicy: 'Always'
   minReadySeconds: 10
   bootstrapArgs: "--upgrade-schema --upgrade-config -f -r"
@@ -167,7 +166,6 @@ zookeeperReady: "config/zookeeper-ready"
 commonProperties: "config/common.properties"
 licenseFolder: "config/license/*"
 apmRtmModelUrl: "https://github.com/kakinpelu/germain/raw/main/helm/germain-demo-env/config/apm-rtm-model.jar"
-rtmVersions: ["2022.5", "2023.1"]
 
 ServiceCheck:
   zookeeper: while [[ \"$(echo ruok | nc germainapm-zookeeper 2181; echo)\" != \"imok\" ]]; do sleep 5; done;

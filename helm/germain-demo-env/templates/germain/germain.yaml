@@ -22,7 +22,7 @@ spec:
           hostPath:
             path: /opt/var/logs
       containers:
-        - image: "{{ .Values.germain.serverRegistry }}:{{ .Values.germain.build }}"
+        - image: "{{ .Values.germain.registry }}/germainapm-server:{{ .Values.germain.build }}"
           imagePullPolicy: {{ .Values.germain.pullPolicy }}
           name: germain-server
           resources:
@@ -107,7 +107,7 @@ spec:
           configMap:
             name: license-folder
       containers:
-        - image: "{{ .Values.germain.servicesRegistry }}:{{ .Values.germain.build }}"
+        - image: "{{ .Values.germain.registry }}/germainapm-services:{{ .Values.germain.build }}"
           imagePullPolicy: {{ .Values.germain.pullPolicy }}
           name: germainapm-storage
           resources:
@@ -180,7 +180,7 @@ kind: Deployment
 metadata:
   name: {{ .Values.spec.germainRtm.serviceName }}
 spec:
-{{if has (substr 0 6 .Values.germain.build) .Values.rtmVersions }}
+{{- if le ((regexFind "[0-9]{1,}\\.[0-9]{1,}" .Values.germain.build) | float64) 2023.1 -}}
   replicas: {{ .Values.spec.germainRtm.replicas }}
 {{ else }}
   replicas: 0
@@ -202,7 +202,7 @@ spec:
           hostPath:
             path: /opt/var
       containers:
-        - image: "{{ .Values.germain.servicesRegistry }}:{{ .Values.germain.build }}"
+        - image: "{{ .Values.germain.registry }}/germainapm-services:{{ .Values.germain.build }}"
           imagePullPolicy: {{ .Values.germain.pullPolicy }}
           name: germainapm-rtm
           resources:
@@ -285,7 +285,7 @@ spec:
           hostPath:
             path: /opt/var
       containers:
-        - image: "{{ .Values.germain.servicesRegistry }}:{{ .Values.germain.build }}"
+        - image: "{{ .Values.germain.registry }}/germainapm-services:{{ .Values.germain.build }}"
           imagePullPolicy: {{ .Values.germain.pullPolicy }}
           name: germainapm-session
           resources:
@@ -366,7 +366,7 @@ spec:
           hostPath:
             path: /opt/var
       containers:
-        - image: "{{ .Values.germain.servicesRegistry }}:{{ .Values.germain.build }}"
+        - image: "{{ .Values.germain.registry }}/germainapm-services:{{ .Values.germain.build }}"
           imagePullPolicy: {{ .Values.germain.pullPolicy }}
           name: germainapm-analytics
           resources:
@@ -449,7 +449,7 @@ spec:
           hostPath:
             path: /opt/var
       containers:
-        - image: "{{ .Values.germain.servicesRegistry }}:{{ .Values.germain.build }}"
+        - image: "{{ .Values.germain.registry }}/germainapm-services:{{ .Values.germain.build }}"
           imagePullPolicy: {{ .Values.germain.pullPolicy }}
           name: germainapm-aggregation
           resources:
@@ -532,7 +532,7 @@ spec:
           hostPath:
             path: /opt/var
       containers:
-        - image: "{{ .Values.germain.servicesRegistry }}:{{ .Values.germain.build }}"
+        - image: "{{ .Values.germain.registry }}/germainapm-services:{{ .Values.germain.build }}"
           imagePullPolicy: {{ .Values.germain.pullPolicy }}
           name: germainapm-action
           resources:
