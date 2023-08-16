@@ -6,6 +6,21 @@ metadata:
 spec:
   #type: ExternalName
   #externalName: {{ .Values.germainDb.Hostname }}
+  clusterIP: None
+  ports:
+  - port: 3306
+  selector:
+    app: db
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-lb
+spec:
+  type: LoadBalancer
+  selector:
+    app: db
   ports:
   - port: 3306
   selector:
