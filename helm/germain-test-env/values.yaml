@@ -112,7 +112,6 @@ spec:
   mysql:
     name: "mysql"
     tag: "latest"
-    replicas: 2
     cpuRequest: *default_cpu_request
     cpuLimit: *default_cpu_limit
     memoryRequest: 512Mi
