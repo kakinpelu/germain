@@ -173,7 +173,7 @@ startZookeeper: "config/start-zookeeper"
 zookeeperReady: "config/zookeeper-ready"
 commonProperties: "config/common.properties"
 licenseFolder: "config/license/*"
-apmRtmModelUrl: "https://germain-apm.s3.us-west-2.amazonaws.com/GermainAPM/2023/apm-rtm-model-2023.3.jar"
+apmRtmModelUrl: "https://github.com/kakinpelu/germain/raw/main/helm/germain-demo-env/config/apm-rtm-model.jar"
 
 ServiceCheck:
   zookeeper: while [[ \"$(echo ruok | nc germainapm-zookeeper 2181; echo)\" != \"imok\" ]]; do sleep 5; done;
