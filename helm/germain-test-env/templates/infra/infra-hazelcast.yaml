@@ -48,16 +48,3 @@ spec:
           env:
             - name: HZ_CLUSTERNAME
               value: "germain"
-          volumeMounts:
-            - name: lib-path
-              mountPath: /opt/hazelcast/lib/apm-rtm-model.jar
-              subPath: apm-rtm-model.jar
-      initContainers:
-      - name: get-apm-rtm-model
-        image: busybox
-        command: ["/bin/sh", "-c", "wget -q {{ .Values.apmRtmModelUrl }} -O /opt/hazelcast/lib/apm-rtm-model.jar"]
-        securityContext:
-          privileged: true
-        volumeMounts:
-        - name: lib-path
-          mountPath: /opt/hazelcast/lib
