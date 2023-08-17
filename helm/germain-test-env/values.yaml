@@ -92,7 +92,7 @@ spec:
     memoryLimit: 1024Mi
   zookeeper:
     name: "zookeeper"
-    tag: "latest"
+    tag: "3.8.2"
     replicas: 2
     serviceName: "germainapm-zookeeper"
     cpuRequest: *default_cpu_request

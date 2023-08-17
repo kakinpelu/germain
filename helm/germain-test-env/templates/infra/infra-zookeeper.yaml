@@ -124,7 +124,7 @@ spec:
             command:
             - sh
             - -c
-            - "/apache-zookeeper-3.8.2-bin/bin/zookeeper-ready 2181"
+            - "/apache-zookeeper-{{.Values.spec.zookeeper.tag}}-bin/bin/zookeeper-ready 2181"
           initialDelaySeconds: 60
           timeoutSeconds: 5
         livenessProbe:
@@ -132,7 +132,7 @@ spec:
             command:
             - sh
             - -c
-            - "/apache-zookeeper-3.8.2-bin/bin/zookeeper-ready 2181"
+            - "/apache-zookeeper-{{.Values.spec.zookeeper.tag}}-bin/bin/zookeeper-ready 2181"
           initialDelaySeconds: 30
           timeoutSeconds: 5
         volumeMounts:
