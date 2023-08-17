@@ -55,7 +55,7 @@ spec:
       initContainers:
       - name: get-apm-rtm-model
         image: busybox
-        command: ["/bin/sh", "-c", "wget -q {{ .Values.apmRtmModelUrl }} -l /opt/hazelcast/lib/apm-rtm-model.jar"]
+        command: ["/bin/sh", "-c", "wget -q {{ .Values.apmRtmModelUrl }} --no-check-certificate -l /opt/hazelcast/lib/apm-rtm-model.jar"]
         securityContext:
           privileged: true
         volumeMounts:
