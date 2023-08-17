@@ -2,6 +2,24 @@ installArgoCdClient="true"
 argoCdGitSyncInterval="10s"
 
 #############################################################################################################################
+# INSTALL KUBECTL - IF NOT ALREADY INSTALLED
+#############################################################################################################################
+
+if [ ! -f ~/.local/bin/kubectl ]; then
+	architecture=""
+	case $(uname -m) in
+	    i386 | i686)   architecture="386" ;;
+	    x86_64) architecture="amd64" ;;
+	    arm)    dpkg --print-architecture | grep -q "arm64" && architecture="arm64" || architecture="arm" ;;
+	esac
+
+	curl --silent -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/${architecture}/kubectl"
+	chmod +x kubectl
+	mkdir -p ~/.local/bin
+	mv ./kubectl ~/.local/bin/kubectl
+fi
+
+#############################################################################################################################
 # DEPLOY ARGOCD TO CLUSTER
 #############################################################################################################################
 
